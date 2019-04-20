@@ -3,6 +3,9 @@
 // 水流量计的脉冲数
 uint flowmeterCount=0;
 
+// 当前所在页面
+extern enum MenuPage page;
+
 // 初始化 外部中断1 接水流量计
 void InitFlowmeter()
 {
@@ -13,6 +16,8 @@ void InitFlowmeter()
 
 void Flowmeter_INT() interrupt 2
 {
-    flowmeterCount++;
+    // 处于正在用水界面, 统计用水量
+    if (page == UsePage)
+        flowmeterCount++;
     //while(!FlowmeterPort); // 释放检测
 }

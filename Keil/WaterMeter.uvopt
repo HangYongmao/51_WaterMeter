@@ -155,12 +155,12 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>buffer</ItemText>
+          <ItemText>price</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>num</ItemText>
+          <ItemText>flowmeterCount</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
