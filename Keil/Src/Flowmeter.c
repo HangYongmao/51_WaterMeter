@@ -16,8 +16,7 @@ void InitFlowmeter()
 
 void Flowmeter_INT() interrupt 2
 {
-    // 处于正在用水界面, 统计用水量
-    if (page == UsePage)
-        flowmeterCount++;
+    // 统计用水量
+    flowmeterCount++;
     //while(!FlowmeterPort); // 释放检测
 }

@@ -22,7 +22,7 @@ extern uint flowmeterCount;
 
 // 当前所在页面
 enum MenuPage page=HomePage;
-
+uint currentWater;
 uint PriceSumH=0;   // 累计用水的价格 整数部分
 uint PriceSumL=0;   // 累计用水的价格 小数部分
 uint WaterSum=0;    // 累计用水量
@@ -40,11 +40,11 @@ unsigned int calcWaterPriceH(unsigned int flowmeterCount)
     // 3L到5L 2元/L
     // 5L以上 3元/L
     unsigned long priceH=0; // 整数部分
-    if (flowmeterCount/PULSE > 5)
+    if (flowmeterCount/PULSE >= 5)
     {
         priceH = 3*1+2*2+(flowmeterCount/PULSE-5)*3;
     }
-    else if (flowmeterCount/PULSE > 3)
+    else if (flowmeterCount/PULSE >= 3)
     {
         priceH = 3*1+(flowmeterCount/PULSE-3)*2;
     }
@@ -59,11 +59,11 @@ unsigned int calcWaterPriceL(unsigned int flowmeterCount)
     // 3L到5L 2元/L
     // 5L以上 3元/L
     unsigned long priceL=0; // 小数部分
-    if (flowmeterCount/PULSE > 5)
+    if (flowmeterCount/PULSE >= 5)
     {
         priceL = (flowmeterCount%PULSE)*100/PULSE*3;
     }
-    else if (flowmeterCount/PULSE > 3)
+    else if (flowmeterCount/PULSE >= 3)
     {
         priceL = (flowmeterCount%PULSE)*2*100/PULSE;
     }
@@ -89,7 +89,10 @@ void main()
     {
         switch(keyscan())
         {
+        case NoKey:
+            break;
         case keyIC:
+        {
             // 显示下一个界面
             // 如果当前在主页面
             // 显示 正在用水
@@ -99,13 +102,11 @@ void main()
                 flowmeterCount = 0;
                 write_com(0x01);	// 显示清0，数据指针清0
                 page = UsePage;
-                EA=1;   // 全局中断开
             }
             // 如果 正在用水
             // 显示 结算界面
             else
             {
-                EA=0;   // 全局中断关
                 write_com(0x01);	// 显示清0，数据指针清0
                 page = SettlePage;
                 
@@ -115,15 +116,28 @@ void main()
                 PriceSumL += calcWaterPriceL(flowmeterCount)%100;
                 // 累计用水量
                 WaterSum += flowmeterCount;
+                
+                // 当前用水量
+                currentWater = flowmeterCount;
+                flowmeterCount = 0;
             }
             break;
+        }
         case keyClear:
+        {
             // 清空所有数据
             flowmeterCount = 0;
             WaterSum = 0;
-        PriceSumH = 0;
-        PriceSumL = 0;
+            PriceSumH = 0;
+            PriceSumL = 0;
+            write_com(0x01);	// 显示清0，数据指针清0
+            write_com(0x80+0x01);
+            LCD_ShowStr("Clear Complete");
+            delay_ms(1000);
+            
+            page = HomePage;
             break;
+        }
         }
         switch(page)
         {
@@ -178,10 +192,10 @@ void main()
             write_date('W');
             write_date(':');
             write_com(0x80+0x02);
-            LCD_ShowInt(flowmeterCount/PULSE);  // 整数部分
+            LCD_ShowInt(currentWater/PULSE);  // 整数部分
             write_date('.');
-            write_date((flowmeterCount%PULSE*10/PULSE)+'0');   // 小数部分
-            write_date((flowmeterCount%PULSE*100/PULSE)%10+'0');
+            write_date((currentWater%PULSE*10/PULSE)+'0');   // 小数部分
+            write_date((currentWater%PULSE*100/PULSE)%10+'0');
             write_date('L');
         
             // LCD显示 第一行
@@ -189,10 +203,10 @@ void main()
             write_date('$');
             write_date(':');
             write_com(0x80+0x8+0x02);
-            LCD_ShowInt(calcWaterPriceH(flowmeterCount)+calcWaterPriceL(flowmeterCount)/100);
+            LCD_ShowInt(calcWaterPriceH(currentWater)+calcWaterPriceL(currentWater)/100);
             write_date('.');
-            write_date(calcWaterPriceL(flowmeterCount)%100/10+'0');
-            write_date(calcWaterPriceL(flowmeterCount)%10+'0');
+            write_date(calcWaterPriceL(currentWater)%100/10+'0');
+            write_date(calcWaterPriceL(currentWater)%10+'0');
             
             // LCD显示 第二行
             write_com(0x80+0x40);

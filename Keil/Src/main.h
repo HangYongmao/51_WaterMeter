@@ -18,8 +18,8 @@ enum MenuPage{
 
 enum KeyValue{
     NoKey,      // 0-没有按键被按下
-    keyIC,  // 1-按下 IC卡
-    keyClear// 2-按下 清空
+    keyIC=1,    // 1-按下 IC卡
+    keyClear=2  // 2-按下 清空
 };
 
 // LCD1602
