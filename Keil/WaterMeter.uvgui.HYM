@@ -3596,9 +3596,9 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>.\Src\main.c</Name>
-        <ColumnNumber>16</ColumnNumber>
-        <TopLine>45</TopLine>
-        <CurrentLine>60</CurrentLine>
+        <ColumnNumber>39</ColumnNumber>
+        <TopLine>33</TopLine>
+        <CurrentLine>49</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
@@ -3641,9 +3641,9 @@
       </Doc>
       <Doc>
         <Name>.\Src\LCD1602.c</Name>
-        <ColumnNumber>0</ColumnNumber>
-        <TopLine>13</TopLine>
-        <CurrentLine>20</CurrentLine>
+        <ColumnNumber>5</ColumnNumber>
+        <TopLine>49</TopLine>
+        <CurrentLine>66</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>

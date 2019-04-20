@@ -42,7 +42,7 @@ void LCD_ShowInt(uint num)
     int n=num, length=0;
     if (num == 0)
     {
-        write_date('Q');
+        write_date('0');
         return;
     }
     
