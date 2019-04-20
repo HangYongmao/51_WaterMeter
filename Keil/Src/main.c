@@ -32,7 +32,7 @@ void delay_ms(uint z)
 {
 	uint x, y;
 	for (x = z; x>0; x--)
-        for (y = 110; y>0; y--);
+        for (y = 114; y>0; y--);
 }
 unsigned int calcWaterPriceH(unsigned int flowmeterCount)
 {
