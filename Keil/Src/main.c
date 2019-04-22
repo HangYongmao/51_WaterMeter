@@ -10,6 +10,7 @@
 */
 
 #include "main.h"
+#include "Timer.h"
 #include "LCD1602.h"
 #include "Flowmeter.h"
 #include <stdlib.h>
@@ -19,6 +20,10 @@
 
 // 水流量计的脉冲数
 extern uint flowmeterCount;
+
+// 用于计算流速
+uint clock=0;
+uint waterL=0;
 
 // 当前所在页面
 enum MenuPage page=HomePage;
@@ -34,6 +39,7 @@ void delay_ms(uint z)
 	for (x = z; x>0; x--)
         for (y = 114; y>0; y--);
 }
+
 unsigned int calcWaterPriceH(unsigned int flowmeterCount)
 {
     // 3L以内 1元/L
@@ -81,6 +87,10 @@ void main()
 
     // 初始化 外部中断1 接水流量计
     InitFlowmeter();
+    
+    // 初始化定时器 测速
+    InitTimer1();
+    
     // LCD显示 第一行
     write_com(0x80+0x01);
     LCD_ShowStr("Welcome To Use");
@@ -102,6 +112,8 @@ void main()
                 flowmeterCount = 0;
                 write_com(0x01);	// 显示清0，数据指针清0
                 page = UsePage;
+                clock = 0;
+                TR1 = 1;		// 定时器1开始计时
             }
             // 如果 正在用水
             // 显示 结算界面
@@ -160,30 +172,43 @@ void main()
             write_date('W');
             write_date('a');
             write_date('t');
-            write_date('e');
-            write_date('r');
             write_date(':');
-            write_com(0x80+0x06);
+            write_com(0x80+0x04);
             LCD_ShowInt(flowmeterCount/PULSE);  // 整数部分
             write_date('.');
             write_date((flowmeterCount%PULSE*10/PULSE)+'0');   // 小数部分
             write_date((flowmeterCount%PULSE*100/PULSE)%10+'0');
             write_date('L');
+            
+            waterL = flowmeterCount/PULSE*100+flowmeterCount%PULSE*10/PULSE*10+flowmeterCount%PULSE*100/PULSE%10;
+            
+            // 显示流速
+            write_com(0x80+0x0A);
+            LCD_ShowInt(waterL/(clock/3));  // 整数部分
+            write_date('.');
+            write_date(waterL*10/(clock/3)%10+'0');
+            write_date(waterL*100/(clock/3)%10+'0');
 
             // LCD显示 第二行
             write_com(0x80+0x40);
             write_date('P');
             write_date('r');
             write_date('i');
-            write_date('c');
-            write_date('e');
             write_date(':');
-            write_com(0x80+0x40+0x06);
+            write_com(0x80+0x40+0x04);
             LCD_ShowInt(calcWaterPriceH(flowmeterCount)+calcWaterPriceL(flowmeterCount)/100);
             write_date('.');
             write_date(calcWaterPriceL(flowmeterCount)%100/10+'0');
             write_date(calcWaterPriceL(flowmeterCount)%10+'0');
             write_date('$');
+            
+            // 流速的单位
+            write_date(' ');
+            write_date('L');
+            write_date('/');
+            write_date('M');
+            write_date('i');
+            write_date('n');
             break;
 
         case SettlePage:
@@ -229,6 +254,13 @@ void main()
             write_date(PriceSumL%100/10+'0');
             write_date(PriceSumL%10+'0');
             break;
+        }
+        if (TF1 == 1)
+        {
+            TF1 = 0;
+            TL1 = 0x00;		//设置定时初值
+            TH1 = 0x4C;		//设置定时初值
+            clock++;
         }
     }
 }
