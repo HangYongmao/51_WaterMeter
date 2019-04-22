@@ -188,6 +188,8 @@ void main()
             write_date('.');
             write_date(waterL*10/(clock/3)%10+'0');
             write_date(waterL*100/(clock/3)%10+'0');
+            write_date(' ');
+            write_date(' ');
 
             // LCD显示 第二行
             write_com(0x80+0x40);
